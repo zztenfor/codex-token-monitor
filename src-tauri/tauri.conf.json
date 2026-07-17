@@ -1,0 +1,62 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Codex Token Monitor",
+  "version": "0.5.1",
+  "identifier": "com.local.codextokenmonitor",
+  "build": {
+    "beforeDevCommand": "npm.cmd run dev",
+    "devUrl": "http://localhost:1420",
+    "beforeBuildCommand": "npm.cmd run build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "Codex Token Monitor",
+        "width": 1180,
+        "height": 780,
+        "minWidth": 760,
+        "minHeight": 600,
+        "center": true,
+        "visible": false,
+        "resizable": true,
+        "fullscreen": false
+      },
+      {
+        "label": "widget",
+        "title": "Codex Token Monitor",
+        "width": 320,
+        "height": 176,
+        "minWidth": 320,
+        "minHeight": 176,
+        "maxWidth": 520,
+        "maxHeight": 520,
+        "visible": false,
+        "decorations": false,
+        "transparent": true,
+        "backgroundColor": "#00000000",
+        "alwaysOnTop": true,
+        "skipTaskbar": true,
+        "resizable": false,
+        "shadow": true
+      }
+    ],
+    "security": { "csp": null }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["nsis", "msi"],
+    "icon": ["icons/icon.ico"],
+    "category": "Utility",
+    "shortDescription": "Local Codex token usage monitor",
+    "longDescription": "A local-first Windows monitor for Codex token metadata.",
+    "windows": {
+      "nsis": {
+        "installerIcon": "icons/icon.ico",
+        "installMode": "currentUser",
+        "displayLanguageSelector": false
+      }
+    }
+  }
+}

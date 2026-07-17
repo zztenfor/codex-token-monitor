@@ -1,0 +1,37 @@
+[package]
+name = "codex-token-monitor"
+version = "0.5.1"
+description = "Local-first Codex token usage monitor"
+authors = ["Codex Token Monitor Contributors"]
+license = "MIT"
+edition = "2021"
+
+[lib]
+name = "codex_token_monitor_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = ["tray-icon", "image-png"] }
+tauri-plugin-dialog = "2"
+tauri-plugin-notification = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+chrono = { version = "0.4", features = ["serde"] }
+rusqlite = { version = "0.32", features = ["bundled"] }
+notify = "7"
+thiserror = "2"
+sha2 = "0.10"
+hex = "0.4"
+csv = "1"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+uuid = { version = "1", features = ["v4"] }
+walkdir = "2"
+reqwest = { version = "0.12", default-features = false, features = ["blocking", "json", "rustls-tls"] }
+sys-locale = "0.3"
+
+[dev-dependencies]
+tempfile = "3"

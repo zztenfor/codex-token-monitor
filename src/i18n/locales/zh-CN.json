@@ -1,0 +1,214 @@
+{
+  "app": {
+    "name": "Codex Token Monitor",
+    "brand": "Codex",
+    "subtitle": "Token 监控器"
+  },
+  "nav": {
+    "dashboard": "仪表盘",
+    "settings": "设置"
+  },
+  "dashboard": {
+    "title": "仪表盘",
+    "subtitle": "本机 Codex Token 使用概览",
+    "syncNow": "立即同步",
+    "todayUsage": "今日用量",
+    "inputTokens": "输入 Token",
+    "cachedInputTokens": "缓存输入 Token",
+    "outputTokens": "输出 Token",
+    "reasoningTokens": "推理输出 Token",
+    "totalTokens": "总 Token",
+    "breakdownTitle": "Token 用量明细",
+    "breakdownSubtitle": "今日互不重叠的 Token 分类",
+    "categoryInput": "输入",
+    "categoryCached": "缓存输入",
+    "categoryOutput": "输出",
+    "categoryReasoning": "推理",
+    "categoryProportions": "Token 分类占比",
+    "usagePrediction": "用量预测",
+    "predictionSubtitle": "根据最近 7 天计算",
+    "projectedMonthly": "本月预计 Token",
+    "dailyAverage": "日均 {{value}}",
+    "usageHistory": "用量历史",
+    "historySubtitle": "Token 消耗趋势",
+    "today": "今天",
+    "days": "{{count}} 天",
+    "projects": "项目",
+    "projectsSubtitle": "按匿名项目标识统计",
+    "projectTokens": "{{value}} Token",
+    "noProjects": "暂无项目统计",
+    "chartTotal": "总计"
+  },
+  "session": {
+    "title": "当前会话",
+    "subtitle": "最近活跃的会话",
+    "live": "实时",
+    "model": "模型",
+    "session": "会话",
+    "unknown": "未知",
+    "contextUsage": "上下文占用",
+    "inContext": "上下文中有 {{value}}",
+    "remaining": "剩余 {{value}}",
+    "limitUnavailable": "上下文上限不可用",
+    "notFound": "尚未发现包含 Token 元数据的会话"
+  },
+  "quota": {
+    "monitorTitle": "额度监控",
+    "monitorSubtitle": "本地滚动 Token 窗口",
+    "fiveHour": "5 小时用量",
+    "weekly": "7 天用量",
+    "usedLabel": "已使用",
+    "used": "已使用 {{value}}%",
+    "setLimit": "请在设置中配置额度",
+    "consumed": "已消耗",
+    "remaining": "剩余",
+    "firstRelease": "最早释放时间 {{time}}",
+    "releasesIn": "距离释放 {{duration}}",
+    "forecast": "预测 {{value}}",
+    "loading": "正在加载额度窗口",
+    "realTitle": "真实账号额度",
+    "realSubtitle": "Codex 官方账号响应",
+    "notReturned": "该账号未返回此窗口",
+    "unavailable": "不可用",
+    "resetIn": "距离重置 {{duration}}",
+    "officialData": "官方数据",
+    "refresh": "刷新账号额度",
+    "updated": "更新于 {{time}}",
+    "notSyncedYet": "尚未同步",
+    "messages": {
+      "AUTH_NOT_FOUND": "请先登录 Codex",
+      "AUTH_INVALID": "请先登录 Codex",
+      "AUTH_EXPIRED": "登录认证已过期",
+      "CONNECTION_FAILED": "连接失败",
+      "QUOTA_UNAVAILABLE": "额度暂不可用",
+      "NOT_SYNCED": "额度暂不可用",
+      "unknown": "额度暂不可用"
+    }
+  },
+  "settings": {
+    "title": "设置",
+    "subtitle": "同步、额度、外观与本地数据",
+    "dataSource": "Codex 数据源",
+    "codexPath": "Codex 路径",
+    "chooseDirectory": "选择目录",
+    "autoDetect": "自动检测",
+    "pathDescription": "只扫描该目录下的 JSONL Token 元数据，不读取项目源码和聊天正文。",
+    "refreshInterval": "刷新间隔",
+    "quotaSettings": "额度设置",
+    "fiveHourLimit": "5 小时额度",
+    "weeklyLimit": "7 天额度",
+    "quotaDescription": "额度是本地滚动 Token 预算。设置为 0 时不计算百分比，也不会冒充官方订阅额度。",
+    "appearanceBudget": "外观与预算",
+    "language": "语言",
+    "languageChinese": "中文（简体）",
+    "languageEnglish": "English",
+    "theme": "主题",
+    "themeSystem": "跟随系统",
+    "themeLight": "浅色",
+    "themeDark": "深色",
+    "dailyBudget": "每日预算",
+    "monthlyBudget": "每月预算",
+    "alertThresholds": "提醒阈值",
+    "localDatabase": "本地数据库",
+    "exportCsv": "导出 CSV",
+    "clearStatistics": "清除统计",
+    "save": "保存设置",
+    "saved": "设置已保存",
+    "exported": "已导出 {{count}} 条记录",
+    "cleared": "使用统计已清除",
+    "choosePathTitle": "选择 Codex 数据目录",
+    "clearConfirm": "确定清除所有已同步的 Token 统计吗？设置不会被删除。"
+    ,"floatingWindow": "悬浮窗"
+    ,"floatingMode": "窗口模式"
+    ,"compactMode": "简洁模式"
+    ,"detailedMode": "详细模式"
+    ,"opacity": "透明度"
+    ,"alwaysOnTop": "始终置顶"
+    ,"clickThrough": "启用鼠标穿透"
+    ,"clickThroughDescription": "悬浮窗将忽略鼠标点击。需要再次操作时，请在设置中关闭此选项。"
+  },
+  "widget": {
+    "title": "Codex 用量",
+    "openDashboard": "打开仪表盘",
+    "close": "关闭悬浮窗",
+    "today": "今日",
+    "waiting": "等待 Codex 数据",
+    "pause": "暂停同步",
+    "resume": "恢复同步"
+    ,"compact": "简洁模式"
+    ,"detailed": "详细模式"
+    ,"status": "Codex 状态"
+    ,"tokenUsage": "Token 用量"
+    ,"quotaStatus": "额度状态"
+    ,"fiveHourWindow": "5 小时窗口"
+    ,"weeklyWindow": "7 天窗口"
+    ,"fiveHourShort": "5H"
+    ,"weeklyShort": "7D"
+    ,"input": "输入 Token"
+    ,"cachedInput": "缓存输入"
+    ,"output": "输出 Token"
+    ,"reasoning": "推理输出"
+    ,"total": "总 Token"
+    ,"tokens": "Token"
+    ,"todayTotal": "今日总量"
+    ,"lastSync": "上次同步"
+    ,"secondsAgo": "{{count}} 秒前"
+    ,"notSynced": "尚未同步"
+    ,"model": "模型"
+    ,"session": "会话"
+    ,"contextUsage": "上下文占用"
+    ,"contextCapacity": "上下文容量"
+    ,"contextRemaining": "剩余容量"
+    ,"used": "已使用"
+    ,"remaining": "剩余"
+    ,"reset": "重置 {{duration}}"
+  },
+  "tray": {
+    "open": "打开窗口",
+    "settings": "设置",
+    "floatingWindow": "悬浮窗",
+    "pauseSync": "暂停同步",
+    "resumeSync": "恢复同步",
+    "exit": "退出",
+    "today": "今日"
+  },
+  "notifications": {
+    "quotaReached": "Codex Token 用量已达到每日预算的 {{threshold}}%"
+  },
+  "status": {
+    "safe": "安全",
+    "warning": "警告",
+    "danger": "危险",
+    "unconfigured": "未配置",
+    "low": "低",
+    "medium": "中",
+    "high": "高",
+    "insufficient": "数据不足"
+  },
+  "format": {
+    "noUsage": "窗口内暂无用量",
+    "daysHours": "{{days}} 天 {{hours}} 小时",
+    "hoursMinutes": "{{hours}} 小时 {{minutes}} 分钟"
+  },
+  "errors": {
+    "generic": "操作未能完成",
+    "codexHome": "未找到 Codex 数据目录",
+    "database": "本地数据库不可用",
+    "invalidSetting": "一个或多个设置无效",
+    "sync": "同步失败",
+    "quota": "额度同步失败"
+  },
+  "common": {
+    "loading": "加载中",
+    "error": "错误",
+    "success": "成功",
+    "cancel": "取消",
+    "save": "保存",
+    "notAvailable": "不可用",
+    "localOnly": "仅本地运行",
+    "localOnlyDescription": "数据不会离开本机",
+    "openFloatingWindow": "打开悬浮窗",
+    "pauseSync": "暂停同步",
+    "resumeSync": "恢复同步"
+  }
+}

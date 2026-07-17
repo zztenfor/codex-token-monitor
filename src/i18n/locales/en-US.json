@@ -1,0 +1,214 @@
+{
+  "app": {
+    "name": "Codex Token Monitor",
+    "brand": "Codex",
+    "subtitle": "Token Monitor"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "settings": "Settings"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Local Codex token usage overview",
+    "syncNow": "Sync now",
+    "todayUsage": "Today's usage",
+    "inputTokens": "Input Tokens",
+    "cachedInputTokens": "Cached Input Tokens",
+    "outputTokens": "Output Tokens",
+    "reasoningTokens": "Reasoning Output",
+    "totalTokens": "Total Tokens",
+    "breakdownTitle": "Token Usage Breakdown",
+    "breakdownSubtitle": "Today, mutually exclusive categories",
+    "categoryInput": "Input",
+    "categoryCached": "Cached Input",
+    "categoryOutput": "Output",
+    "categoryReasoning": "Reasoning",
+    "categoryProportions": "Token category proportions",
+    "usagePrediction": "Usage Prediction",
+    "predictionSubtitle": "Based on the last 7 days",
+    "projectedMonthly": "Projected this month",
+    "dailyAverage": "Daily average {{value}}",
+    "usageHistory": "Usage History",
+    "historySubtitle": "Token consumption trend",
+    "today": "Today",
+    "days": "{{count}} days",
+    "projects": "Projects",
+    "projectsSubtitle": "Statistics by anonymous project identifier",
+    "projectTokens": "{{value}} tokens",
+    "noProjects": "No project statistics yet",
+    "chartTotal": "Total"
+  },
+  "session": {
+    "title": "Current Session",
+    "subtitle": "Most recently active session",
+    "live": "Live",
+    "model": "Model",
+    "session": "Session",
+    "unknown": "Unknown",
+    "contextUsage": "Context usage",
+    "inContext": "{{value}} in context",
+    "remaining": "{{value}} remaining",
+    "limitUnavailable": "Context limit unavailable",
+    "notFound": "No session with token metadata found"
+  },
+  "quota": {
+    "monitorTitle": "Quota Monitor",
+    "monitorSubtitle": "Local rolling token windows",
+    "fiveHour": "5 Hour Usage",
+    "weekly": "Weekly Usage",
+    "usedLabel": "Used",
+    "used": "{{value}}% used",
+    "setLimit": "Set a limit in Settings",
+    "consumed": "Consumed",
+    "remaining": "Remaining",
+    "firstRelease": "First release {{time}}",
+    "releasesIn": "Releases in {{duration}}",
+    "forecast": "Forecast {{value}}",
+    "loading": "Loading quota windows",
+    "realTitle": "Real Account Quota",
+    "realSubtitle": "Official Codex account response",
+    "notReturned": "Not returned by this account",
+    "unavailable": "Unavailable",
+    "resetIn": "Reset in {{duration}}",
+    "officialData": "Official data",
+    "refresh": "Refresh account quota",
+    "updated": "Updated {{time}}",
+    "notSyncedYet": "Not synced yet",
+    "messages": {
+      "AUTH_NOT_FOUND": "Please login Codex first",
+      "AUTH_INVALID": "Please login Codex first",
+      "AUTH_EXPIRED": "Authentication expired",
+      "CONNECTION_FAILED": "Connection failed",
+      "QUOTA_UNAVAILABLE": "Quota unavailable",
+      "NOT_SYNCED": "Quota unavailable",
+      "unknown": "Quota unavailable"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Sync, quota, appearance, and local data",
+    "dataSource": "Codex Data Source",
+    "codexPath": "Codex Path",
+    "chooseDirectory": "Choose directory",
+    "autoDetect": "Auto detect",
+    "pathDescription": "Only JSONL token metadata under this directory is scanned. Project source code and conversation content are never read.",
+    "refreshInterval": "Refresh Interval",
+    "quotaSettings": "Quota Settings",
+    "fiveHourLimit": "5 Hour Limit",
+    "weeklyLimit": "Weekly Limit",
+    "quotaDescription": "These limits are local rolling token budgets. A value of 0 disables percentages and never pretends to be an official subscription limit.",
+    "appearanceBudget": "Appearance and Budgets",
+    "language": "Language",
+    "languageChinese": "中文（简体）",
+    "languageEnglish": "English",
+    "theme": "Theme",
+    "themeSystem": "System",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "dailyBudget": "Daily Budget",
+    "monthlyBudget": "Monthly Budget",
+    "alertThresholds": "Alert Thresholds",
+    "localDatabase": "Local Database",
+    "exportCsv": "Export CSV",
+    "clearStatistics": "Clear Statistics",
+    "save": "Save Settings",
+    "saved": "Settings saved",
+    "exported": "Exported {{count}} records",
+    "cleared": "Usage statistics cleared",
+    "choosePathTitle": "Choose Codex data directory",
+    "clearConfirm": "Clear all synchronized token statistics? Settings will be preserved."
+    ,"floatingWindow": "Floating Window"
+    ,"floatingMode": "Window Mode"
+    ,"compactMode": "Compact"
+    ,"detailedMode": "Detailed"
+    ,"opacity": "Opacity"
+    ,"alwaysOnTop": "Always On Top"
+    ,"clickThrough": "Enable Click Through"
+    ,"clickThroughDescription": "The floating window will ignore mouse clicks. Disable this option from Settings to interact with it again."
+  },
+  "widget": {
+    "title": "Codex Usage",
+    "openDashboard": "Open Dashboard",
+    "close": "Close floating window",
+    "today": "Today",
+    "waiting": "Waiting for Codex",
+    "pause": "Pause sync",
+    "resume": "Resume sync"
+    ,"compact": "Compact mode"
+    ,"detailed": "Detailed mode"
+    ,"status": "Codex Status"
+    ,"tokenUsage": "Token Usage"
+    ,"quotaStatus": "Quota Status"
+    ,"fiveHourWindow": "5 Hour Window"
+    ,"weeklyWindow": "Weekly Window"
+    ,"fiveHourShort": "5H"
+    ,"weeklyShort": "7D"
+    ,"input": "Input Tokens"
+    ,"cachedInput": "Cached Input"
+    ,"output": "Output Tokens"
+    ,"reasoning": "Reasoning Output"
+    ,"total": "Total Tokens"
+    ,"tokens": "tokens"
+    ,"todayTotal": "Today Total"
+    ,"lastSync": "Last Sync"
+    ,"secondsAgo": "{{count}}s ago"
+    ,"notSynced": "Not synced"
+    ,"model": "Model"
+    ,"session": "Session"
+    ,"contextUsage": "Context Usage"
+    ,"contextCapacity": "Context capacity"
+    ,"contextRemaining": "Remaining"
+    ,"used": "Used"
+    ,"remaining": "Remaining"
+    ,"reset": "Reset {{duration}}"
+  },
+  "tray": {
+    "open": "Open",
+    "settings": "Settings",
+    "floatingWindow": "Floating Window",
+    "pauseSync": "Pause Sync",
+    "resumeSync": "Resume Sync",
+    "exit": "Exit",
+    "today": "Today"
+  },
+  "notifications": {
+    "quotaReached": "Codex token usage reached {{threshold}}% of the daily budget"
+  },
+  "status": {
+    "safe": "Safe",
+    "warning": "Warning",
+    "danger": "Danger",
+    "unconfigured": "Unconfigured",
+    "low": "Low",
+    "medium": "Medium",
+    "high": "High",
+    "insufficient": "Insufficient"
+  },
+  "format": {
+    "noUsage": "No usage in window",
+    "daysHours": "{{days}}d {{hours}}h",
+    "hoursMinutes": "{{hours}}h {{minutes}}m"
+  },
+  "errors": {
+    "generic": "The operation could not be completed",
+    "codexHome": "Codex data directory was not found",
+    "database": "The local database is unavailable",
+    "invalidSetting": "One or more settings are invalid",
+    "sync": "Synchronization failed",
+    "quota": "Quota synchronization failed"
+  },
+  "common": {
+    "loading": "Loading",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "save": "Save",
+    "notAvailable": "N/A",
+    "localOnly": "Local only",
+    "localOnlyDescription": "Data stays on this device",
+    "openFloatingWindow": "Open floating window",
+    "pauseSync": "Pause Sync",
+    "resumeSync": "Resume Sync"
+  }
+}
