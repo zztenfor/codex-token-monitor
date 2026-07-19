@@ -89,8 +89,16 @@ export function Dashboard({ data, range, loading, onRange, onSync, quotaLoading,
 
         <div className="panel prediction-panel">
           <div className="panel-title"><div><h2>{t("dashboard.usagePrediction")}</h2><p>{t("dashboard.predictionSubtitle")}</p></div><Database size={19} /></div>
-          <div className="prediction-value">{tokens(data?.projectedMonthlyTokens ?? 0)}</div>
-          <span className="prediction-label">{t("dashboard.projectedMonthly")}</span>
+          <div className="prediction-stats">
+            <div className="prediction-stat">
+              <strong>{tokens(data?.monthlyTotalTokens ?? 0)}</strong>
+              <span>{t("dashboard.monthlyActual")}</span>
+            </div>
+            <div className="prediction-stat prediction-stat-forecast">
+              <strong>{tokens(data?.projectedMonthlyTokens ?? 0)}</strong>
+              <span>{t("dashboard.projectedMonthly")}</span>
+            </div>
+          </div>
           <div className="prediction-footer"><span>{t("dashboard.dailyAverage", { value: tokens(data?.dailyAverageTokens ?? 0) })}</span><span className={`risk ${data?.riskLevel ?? "insufficient"}`}>{t(`status.${data?.riskLevel ?? "insufficient"}`)}</span></div>
         </div>
       </section>

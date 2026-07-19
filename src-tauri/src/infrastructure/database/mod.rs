@@ -62,6 +62,14 @@ impl Database {
         if version < 5 {
             connection.execute_batch(include_str!("../../../migrations/0005_real_quota.sql"))?;
         }
+        let version: i64 = connection.query_row(
+            "SELECT COALESCE(MAX(version),0) FROM schema_migrations",
+            [],
+            |row| row.get(0),
+        )?;
+        if version < 6 {
+            connection.execute_batch(include_str!("../../../migrations/0006_pricing_versions.sql"))?;
+        }
         let db = Self { connection };
         db.ensure_defaults()?;
         Ok(db)
@@ -290,6 +298,7 @@ impl Database {
             current_session,
             chart,
             projects,
+            monthly_total_tokens: month_used,
             projected_monthly_tokens,
             daily_average_tokens,
             risk_level,
@@ -321,6 +330,14 @@ impl Database {
         self.connection.execute(
             "INSERT INTO quota_snapshot(created_at,status) VALUES(?1,?2)",
             params![Utc::now().to_rfc3339(), status],
+        )?;
+        Ok(())
+    }
+
+    pub fn save_pricing_version(&self, version: &str, source: &str, updated_at: &str) -> AppResult<()> {
+        self.connection.execute(
+            "INSERT INTO pricing_versions(version,source,updated_at) VALUES(?1,?2,?3)",
+            params![version, source, updated_at],
         )?;
         Ok(())
     }
@@ -505,6 +522,30 @@ mod tests {
     }
 
     #[test]
+    fn saves_pricing_version_metadata() {
+        let temp = tempfile::tempdir().unwrap();
+        let db = Database::open(&temp.path().join("pricing.db")).unwrap();
+        db.save_pricing_version("2026-07-18", "online", "2026-07-18T12:00:00Z")
+            .unwrap();
+        let saved: (String, String, String) = db
+            .connection
+            .query_row(
+                "SELECT version,source,updated_at FROM pricing_versions LIMIT 1",
+                [],
+                |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?)),
+            )
+            .unwrap();
+        assert_eq!(
+            saved,
+            (
+                "2026-07-18".into(),
+                "online".into(),
+                "2026-07-18T12:00:00Z".into()
+            )
+        );
+    }
+
+    #[test]
     fn migrates_v3_usage_without_deleting_rows() {
         let temp = tempfile::tempdir().unwrap();
         let path = temp.path().join("legacy.db");
@@ -538,7 +579,13 @@ mod tests {
                 Ok((row.get(0)?, row.get(1)?, row.get(2)?, row.get(3)?, row.get(4)?))
             })
             .unwrap();
-        assert_eq!(version, 5);
+        assert_eq!(version, 6);
+        assert_eq!(
+            db.connection
+                .query_row("SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='pricing_versions'", [], |row| row.get::<_, i64>(0))
+                .unwrap(),
+            1
+        );
         assert_eq!(values, (80, 20, 30, 10, 140));
         for table in ["sessions", "daily_usage"] {
             let sql = format!("SELECT input_tokens,cached_input_tokens,output_tokens,reasoning_output_tokens,total_tokens FROM {table} LIMIT 1");
@@ -591,6 +638,7 @@ mod tests {
         assert!(dashboard.five_hour_quota.reset_in_seconds.is_some());
         assert_eq!(dashboard.weekly_quota.consumed_tokens, 500);
         assert_ne!(dashboard.five_hour_quota.forecast_status, "unconfigured");
+        assert_eq!(dashboard.monthly_total_tokens, 500);
     }
 
     #[test]

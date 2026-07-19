@@ -21,18 +21,106 @@ use tauri_plugin_notification::NotificationExt;
 
 pub struct AppState {
     pub database: Arc<Mutex<Database>>,
+    pub data_dir: PathBuf,
     pub sync_in_progress: AtomicBool,
     pub quota_sync_in_progress: AtomicBool,
 }
 
 impl AppState {
-    pub fn new(database: Database) -> Self {
+    pub fn new(database: Database, data_dir: PathBuf) -> Self {
         Self {
             database: Arc::new(Mutex::new(database)),
+            data_dir,
             sync_in_progress: AtomicBool::new(false),
             quota_sync_in_progress: AtomicBool::new(false),
         }
     }
+}
+
+const PRICING_SOURCE_URL: &str = "https://developers.openai.com/api/docs/pricing";
+
+#[tauri::command]
+pub async fn fetch_pricing_source() -> AppResult<String> {
+    let response = reqwest::Client::builder()
+        .connect_timeout(std::time::Duration::from_secs(10))
+        .timeout(std::time::Duration::from_secs(20))
+        .user_agent("Codex Token Monitor")
+        .build()
+        .map_err(|_| AppError::Other("Pricing source unavailable".into()))?
+        .get(PRICING_SOURCE_URL)
+        .send()
+        .await
+        .map_err(|_| AppError::Other("Pricing source unavailable".into()))?;
+    if !response.status().is_success() {
+        return Err(AppError::Other("Pricing source unavailable".into()));
+    }
+    let body = response
+        .text()
+        .await
+        .map_err(|_| AppError::Other("Pricing source unavailable".into()))?;
+    if body.len() > 5_000_000 {
+        return Err(AppError::Other("Pricing source is too large".into()));
+    }
+    Ok(body)
+}
+
+#[tauri::command]
+pub async fn read_pricing_cache(state: tauri::State<'_, AppState>) -> AppResult<Option<String>> {
+    let path = state.data_dir.join("pricing_cache.json");
+    tauri::async_runtime::spawn_blocking(move || match std::fs::read_to_string(path) {
+        Ok(value) => Ok(Some(value)),
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => Ok(None),
+        Err(error) => Err(AppError::Io(error)),
+    })
+    .await
+    .map_err(|error| AppError::Other(format!("Pricing cache read failed: {error}")))?
+}
+
+#[tauri::command]
+pub async fn save_pricing_cache(
+    state: tauri::State<'_, AppState>,
+    cache_json: String,
+) -> AppResult<()> {
+    let value: serde_json::Value = serde_json::from_str(&cache_json)
+        .map_err(|_| AppError::Other("Pricing cache is invalid".into()))?;
+    let object = value
+        .as_object()
+        .ok_or_else(|| AppError::Other("Pricing cache is invalid".into()))?;
+    let updated_at = object
+        .get("updated_at")
+        .and_then(serde_json::Value::as_str)
+        .ok_or_else(|| AppError::Other("Pricing cache timestamp is missing".into()))?
+        .to_owned();
+    let version = object
+        .get("version")
+        .and_then(serde_json::Value::as_str)
+        .ok_or_else(|| AppError::Other("Pricing cache version is missing".into()))?
+        .to_owned();
+    let source = object
+        .get("source")
+        .and_then(serde_json::Value::as_str)
+        .ok_or_else(|| AppError::Other("Pricing cache source is missing".into()))?
+        .to_owned();
+    if !matches!(source.as_str(), "online" | "local")
+        || !object.get("models").is_some_and(serde_json::Value::is_array)
+    {
+        return Err(AppError::Other("Pricing cache is invalid".into()));
+    }
+    let data_dir = state.data_dir.clone();
+    let database = state.database.clone();
+    tauri::async_runtime::spawn_blocking(move || {
+        std::fs::create_dir_all(&data_dir)?;
+        let path = data_dir.join("pricing_cache.json");
+        let temp_path = data_dir.join("pricing_cache.json.tmp");
+        std::fs::write(&temp_path, cache_json)?;
+        std::fs::rename(&temp_path, &path)?;
+        let database = database
+            .lock()
+            .map_err(|_| AppError::Other("Database lock is poisoned".into()))?;
+        database.save_pricing_version(&version, &source, &updated_at)
+    })
+    .await
+    .map_err(|error| AppError::Other(format!("Pricing cache save failed: {error}")))?
 }
 
 pub fn perform_account_quota_sync(app: &AppHandle) -> AppResult<RealAccountQuota> {

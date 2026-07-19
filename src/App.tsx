@@ -1,9 +1,10 @@
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { listen } from "@tauri-apps/api/event";
-import { BarChart3, Pause, PictureInPicture2, Play, Settings as SettingsIcon, ShieldCheck } from "lucide-react";
+import { BarChart3, CircleDollarSign, Pause, PictureInPicture2, Play, Settings as SettingsIcon, ShieldCheck } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Dashboard } from "./features/Dashboard";
+import { Cost } from "./features/Cost";
 import { FloatingWidget } from "./features/FloatingWidget";
 import { Settings } from "./features/Settings";
 import i18n, { detectSystemLanguage, normalizeLanguage } from "./i18n";
@@ -11,6 +12,9 @@ import { translateError } from "./i18n/errors";
 import { readUsageRange, saveUsageRange, type UsageRange } from "./lib/preferences";
 import { api } from "./lib/tauri";
 import type { AppSettings, DashboardData } from "./lib/types";
+import { PricingService, type PricingSnapshot } from "./services/pricing";
+
+const pricingService = new PricingService();
 
 const defaults: AppSettings = {
   codexPath: "",
@@ -32,7 +36,7 @@ const defaults: AppSettings = {
 
 function MainApp() {
   const { t } = useTranslation();
-  const [view, setView] = useState<"dashboard" | "settings">("dashboard");
+  const [view, setView] = useState<"dashboard" | "cost" | "settings">("dashboard");
   const [range, setRange] = useState<UsageRange>(readUsageRange);
   const rangeRef = useRef<UsageRange>(range);
   const loadRequestRef = useRef(0);
@@ -41,6 +45,8 @@ function MainApp() {
   const [loading, setLoading] = useState(false);
   const [quotaLoading, setQuotaLoading] = useState(false);
   const [error, setError] = useState("");
+  const [pricing, setPricing] = useState<PricingSnapshot>(() => pricingService.getSnapshot());
+  const [pricingLoading, setPricingLoading] = useState(false);
 
   const load = useCallback(async () => {
     const requestedRange = rangeRef.current;
@@ -87,6 +93,13 @@ function MainApp() {
     }
   }, [load, t]);
 
+  const refreshPricing = useCallback(async () => {
+    setPricingLoading(true);
+    const next = await pricingService.syncPricing();
+    setPricing(next);
+    setPricingLoading(false);
+  }, []);
+
   useEffect(() => {
     api.settings().then(async (saved) => {
       const language = normalizeLanguage(saved.language || detectSystemLanguage());
@@ -95,7 +108,11 @@ function MainApp() {
       if (!saved.language) await api.saveSettings({ ...saved, language });
     }).catch((cause) => setError(translateError(cause, t)));
     void sync();
-  }, []);
+    void pricingService.initialize().then((snapshot) => {
+      setPricing(snapshot);
+      if (pricingService.needsSync()) void refreshPricing();
+    });
+  }, [refreshPricing]);
 
   useEffect(() => {
     void load();
@@ -140,6 +157,7 @@ function MainApp() {
         <div className="brand"><span className="brand-mark">C</span><div><strong>{t("app.brand")}</strong><span>{t("app.subtitle")}</span></div></div>
         <nav>
           <button className={view === "dashboard" ? "active" : ""} onClick={() => setView("dashboard")}><BarChart3 size={19} />{t("nav.dashboard")}</button>
+          <button className={view === "cost" ? "active" : ""} onClick={() => setView("cost")}><CircleDollarSign size={19} />{t("nav.cost")}</button>
           <button className={view === "settings" ? "active" : ""} onClick={() => setView("settings")}><SettingsIcon size={19} />{t("nav.settings")}</button>
         </nav>
         <div className="sidebar-bottom">
@@ -150,7 +168,7 @@ function MainApp() {
       </aside>
       <div className="content">
         {error && <div className="error-banner">{error}</div>}
-        {view === "dashboard" ? <Dashboard data={data} range={range} loading={loading} onRange={selectRange} onSync={sync} quotaLoading={quotaLoading} onQuotaSync={syncQuota} /> : <Settings settings={settings} onSaved={(next) => { setSettings(next); void load(); }} />}
+        {view === "dashboard" ? <Dashboard data={data} range={range} loading={loading} onRange={selectRange} onSync={sync} quotaLoading={quotaLoading} onQuotaSync={syncQuota} /> : view === "cost" ? <Cost data={data} pricing={pricing} onRefresh={() => void refreshPricing()} loading={pricingLoading} /> : <Settings settings={settings} pricing={pricing} pricingLoading={pricingLoading} onRefreshPricing={() => void refreshPricing()} onSaved={(next) => { setSettings(next); void load(); }} />}
       </div>
     </div>
   );

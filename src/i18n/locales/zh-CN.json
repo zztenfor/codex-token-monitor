@@ -5,6 +5,7 @@
     "subtitle": "Token 监控器"
   },
   "nav": {
+    "cost": "\u8d39\u7528",
     "dashboard": "仪表盘",
     "settings": "设置"
   },
@@ -27,6 +28,7 @@
     "categoryProportions": "Token 分类占比",
     "usagePrediction": "用量预测",
     "predictionSubtitle": "根据最近 7 天计算",
+    "monthlyActual": "本月实际合计",
     "projectedMonthly": "本月预计 Token",
     "dailyAverage": "日均 {{value}}",
     "usageHistory": "用量历史",
@@ -38,6 +40,34 @@
     "projectTokens": "{{value}} Token",
     "noProjects": "暂无项目统计",
     "chartTotal": "总计"
+  },
+  "cost": {
+    "title": "Token \u8d39\u7528\u8ba1\u7b97\u5668",
+    "subtitle": "\u6839\u636e\u5f53\u524d Session Token \u5143\u6570\u636e\u4f30\u7b97 API \u8d39\u7528",
+    "currentModel": "\u5f53\u524d\u6a21\u578b",
+    "noSession": "\u6682\u65e0\u6d3b\u8dc3 Session",
+    "currentSessionEstimate": "\u5f53\u524d Session \u4f30\u7b97",
+    "breakdown": "\u8d39\u7528\u660e\u7ec6",
+    "reasoningIncluded": "\u63a8\u7406\u8f93\u51fa\u6309\u8f93\u51fa Token \u4ef7\u683c\u8ba1\u7b97",
+    "modelPricing": "\u6a21\u578b\u4ef7\u683c",
+    "modelPricingSubtitle": "\u4ef7\u683c\u5355\u4f4d\u4e3a\u6bcf\u767e\u4e07 Token",
+    "model": "\u6a21\u578b",
+    "inputPrice": "\u8f93\u5165",
+    "cachedPrice": "\u7f13\u5b58\u8f93\u5165",
+    "outputPrice": "\u8f93\u51fa",
+    "localNotice": "\u672c\u5730\u4f18\u5148\u7684\u4ef7\u683c\u6570\u636e",
+    "localNoticeDescription": "\u53ea\u8bf7\u6c42\u516c\u5f00\u4ef7\u683c\u5143\u6570\u636e\uff0c\u4e0d\u4f1a\u53d1\u9001\u51ed\u636e\u6216\u7528\u91cf\u6570\u636e\u3002"
+  },
+  "pricing": {
+    "source": "\u4ef7\u683c\u6765\u6e90",
+    "online": "\u5728\u7ebf",
+    "localFallback": "\u672c\u5730\u5907\u7528",
+    "unavailable": "\u4ef7\u683c\u4e0d\u53ef\u7528",
+    "unavailableDescription": "\u8be5\u6a21\u578b\u6ca1\u6709\u5b8c\u6574\u4ef7\u683c\u6570\u636e\uff0c\u56e0\u6b64\u4e0d\u4f30\u7b97\u8d39\u7528\u3002",
+    "lastUpdated": "\u6700\u540e\u66f4\u65b0",
+    "never": "\u4ece\u672a",
+    "refreshNow": "\u7acb\u5373\u5237\u65b0\u4ef7\u683c",
+    "refreshFailed": "\u5728\u7ebf\u4ef7\u683c\u4e0d\u53ef\u7528\uff0c\u5df2\u7ee7\u7eed\u4f7f\u7528\u672c\u5730\u5907\u7528\u3002"
   },
   "session": {
     "title": "当前会话",
@@ -86,6 +116,8 @@
     }
   },
   "settings": {
+    "pricing": "\u4ef7\u683c",
+    "pricingDescription": "\u5728\u7ebf\u4ef7\u683c\u6bcf\u5929\u68c0\u67e5\u4e00\u6b21\uff0c\u5e76\u4fdd\u5b58\u4e3a\u672c\u5730 pricing_cache.json\u3002",
     "title": "设置",
     "subtitle": "同步、额度、外观与本地数据",
     "dataSource": "Codex 数据源",

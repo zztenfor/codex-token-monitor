@@ -104,6 +104,7 @@ pub struct DashboardData {
     pub current_session: Option<CurrentSession>,
     pub chart: Vec<UsagePoint>,
     pub projects: Vec<ProjectUsage>,
+    pub monthly_total_tokens: i64,
     pub projected_monthly_tokens: i64,
     pub daily_average_tokens: i64,
     pub risk_level: String,

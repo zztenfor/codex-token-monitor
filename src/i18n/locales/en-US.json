@@ -6,6 +6,7 @@
   },
   "nav": {
     "dashboard": "Dashboard",
+    "cost": "Cost",
     "settings": "Settings"
   },
   "dashboard": {
@@ -27,6 +28,7 @@
     "categoryProportions": "Token category proportions",
     "usagePrediction": "Usage Prediction",
     "predictionSubtitle": "Based on the last 7 days",
+    "monthlyActual": "Actual this month",
     "projectedMonthly": "Projected this month",
     "dailyAverage": "Daily average {{value}}",
     "usageHistory": "Usage History",
@@ -38,6 +40,34 @@
     "projectTokens": "{{value}} tokens",
     "noProjects": "No project statistics yet",
     "chartTotal": "Total"
+  },
+  "cost": {
+    "title": "Token Cost Calculator",
+    "subtitle": "Estimated API cost from the current session token metadata",
+    "currentModel": "Current Model",
+    "noSession": "No active session",
+    "currentSessionEstimate": "Current session estimate",
+    "breakdown": "Cost Breakdown",
+    "reasoningIncluded": "Reasoning output is charged at the output-token rate",
+    "modelPricing": "Model Pricing",
+    "modelPricingSubtitle": "Prices are shown per one million tokens",
+    "model": "Model",
+    "inputPrice": "Input",
+    "cachedPrice": "Cached Input",
+    "outputPrice": "Output",
+    "localNotice": "Local-first pricing",
+    "localNoticeDescription": "Only public pricing metadata is requested. Credentials and usage data are never sent."
+  },
+  "pricing": {
+    "source": "Pricing Source",
+    "online": "Online",
+    "localFallback": "Local fallback",
+    "unavailable": "Pricing unavailable",
+    "unavailableDescription": "A complete price for this model is not available, so no cost is estimated.",
+    "lastUpdated": "Last Updated",
+    "never": "Never",
+    "refreshNow": "Refresh pricing now",
+    "refreshFailed": "Online pricing was unavailable; the local fallback is still active."
   },
   "session": {
     "title": "Current Session",
@@ -89,6 +119,8 @@
     "title": "Settings",
     "subtitle": "Sync, quota, appearance, and local data",
     "dataSource": "Codex Data Source",
+    "pricing": "Pricing",
+    "pricingDescription": "Online pricing is checked once per day and cached locally as pricing_cache.json.",
     "codexPath": "Codex Path",
     "chooseDirectory": "Choose directory",
     "autoDetect": "Auto detect",

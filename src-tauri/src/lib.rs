@@ -171,7 +171,7 @@ pub fn run() {
                 .map(PathBuf::from)
                 .unwrap_or(app.path().app_data_dir()?);
             let db = infrastructure::database::Database::open(&data_dir.join("token_usage.db"))?;
-            app.manage(AppState::new(db));
+            app.manage(AppState::new(db, data_dir));
             let initial_settings = app
                 .state::<AppState>()
                 .database
@@ -208,6 +208,9 @@ pub fn run() {
             commands::save_settings,
             commands::sync_now,
             commands::sync_account_quota,
+            commands::fetch_pricing_source,
+            commands::read_pricing_cache,
+            commands::save_pricing_cache,
             commands::set_sync_paused,
             commands::export_csv,
             commands::clear_usage_data,
