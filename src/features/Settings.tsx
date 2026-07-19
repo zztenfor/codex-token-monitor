@@ -1,17 +1,21 @@
 import { open, save } from "@tauri-apps/plugin-dialog";
-import { Database, FolderOpen, RotateCcw, Save, Trash2 } from "lucide-react";
+import { Database, FolderOpen, RefreshCw, RotateCcw, Save, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { translateError } from "../i18n/errors";
 import { api } from "../lib/tauri";
 import type { AppSettings, FloatingMode, Language } from "../lib/types";
+import type { PricingSnapshot } from "../services/pricing";
 
 interface Props {
   settings: AppSettings;
+  pricing: PricingSnapshot;
+  pricingLoading: boolean;
+  onRefreshPricing: () => void;
   onSaved: (settings: AppSettings) => void;
 }
 
-export function Settings({ settings, onSaved }: Props) {
+export function Settings({ settings, pricing, pricingLoading, onRefreshPricing, onSaved }: Props) {
   const { t, i18n } = useTranslation();
   const [form, setForm] = useState(settings);
   const [status, setStatus] = useState("");
@@ -91,6 +95,12 @@ export function Settings({ settings, onSaved }: Props) {
       <div className="segments settings-segments">{([1, 5, 10, 30] as const).map((seconds) =>
         <button key={seconds} className={form.refreshIntervalSeconds === seconds ? "active" : ""} onClick={() => update("refreshIntervalSeconds", seconds)}>{seconds}s</button>
       )}</div>
+    </section>
+
+    <section className="settings-section">
+      <h2>{t("settings.pricing")}</h2>
+      <div className="pricing-settings-row"><div><strong>{pricing.source === "online" ? t("pricing.online") : pricing.source === "local" ? t("pricing.localFallback") : t("pricing.unavailable")}</strong><small>{t("pricing.lastUpdated")}: {pricing.updatedAt ? new Date(pricing.updatedAt).toLocaleString(i18n.resolvedLanguage ?? i18n.language) : t("pricing.never")}</small></div><button className="icon-button" onClick={onRefreshPricing} disabled={pricingLoading} title={t("pricing.refreshNow")} aria-label={t("pricing.refreshNow")}><RefreshCw size={18} className={pricingLoading ? "spin" : ""} /></button></div>
+      <small>{pricing.error ? t("pricing.refreshFailed") : t("settings.pricingDescription")}</small>
     </section>
 
     <section className="settings-section">

@@ -26,6 +26,8 @@ Download the latest Windows installer from [GitHub Releases](../../releases). Ex
 - Compact and detailed floating-window presets with live token/quota status, opacity, click-through, and always-on-top controls
 - Configurable daily/monthly budget alerts at 80%, 90%, and 95%
 - Local CSV export and local data cleanup
+- Online OpenAI model pricing sync with a daily local cache and local fallback
+- Token Cost Calculator with model aliases and conservative unavailable-price handling
 - Light, dark, and system themes
 - Simplified Chinese and English UI with instant language switching
 
@@ -93,7 +95,7 @@ src-tauri\target\release\bundle\msi
 
 ## Local data
 
-The application database is named `token_usage.db` and is created under the Windows application data directory for `com.local.codextokenmonitor`. Schema v4 adds `cached_input_tokens` and `reasoning_output_tokens`; schema v5 adds credential-free official quota snapshots. Existing rows are preserved. Clearing data removes synchronized usage, projects, checkpoints, quota snapshots, and alert history while preserving settings.
+The application database is named `token_usage.db` and is created under the Windows application data directory for `com.local.codextokenmonitor`. Schema v4 adds `cached_input_tokens` and `reasoning_output_tokens`; schema v5 adds credential-free official quota snapshots; schema v6 adds `pricing_versions`. Existing rows are preserved. The public pricing cache is stored beside the database as `pricing_cache.json`. Clearing data removes synchronized usage, projects, checkpoints, quota snapshots, and alert history while preserving settings and pricing cache.
 
 Quota limits are local token budgets configured in Settings. Their defaults are loaded from `src-tauri/config/default.json`; zero means unconfigured. They are not OpenAI account or subscription limits.
 
@@ -104,6 +106,8 @@ The first release supports `zh-CN` and `en-US`. The selected language is stored 
 Floating-window preferences are stored in the same settings JSON: `floatingOpacity` (0.2-1.0), `floatingAlwaysOnTop`, `floatingClickThrough`, and `floatingMode` (`compact` or `detailed`). Tauri's current Window API does not expose runtime `setOpacity`, so opacity is applied immediately as a CSS fallback while always-on-top, click-through, dragging, and mode resizing use native Window APIs.
 
 Official quota sync currently reads file-based credentials from `%USERPROFILE%\.codex\auth.json`. Codex installations configured to store credentials only in the Windows credential manager are not yet supported. The service accepts nested and legacy token fields and classifies returned windows by their declared duration. If the account endpoint omits the 5-hour or weekly window, the UI reports that window as unavailable instead of substituting an estimate.
+
+Online pricing sync reads the Standard table on the public OpenAI pricing page at `https://developers.openai.com/api/docs/pricing` through a fixed Rust network command. It runs at startup only when `pricing_cache.json` is missing or older than 24 hours, and can be triggered manually from Settings or the Cost page. No authorization header, account identifier, usage data, or Codex content is sent. The parser accepts model IDs and aliases, including `gpt-5.6-codex` -> `gpt-5.6`. If a model lacks a complete input/cached-input/output price, the calculator reports `Pricing unavailable` instead of inventing a price. See [docs/pricing.md](docs/pricing.md).
 
 ## Supported Codex metadata
 

@@ -2,6 +2,22 @@
 
 All notable changes to this project are documented here. The project follows semantic versioning where practical.
 
+## [0.6.0] - 2026-07-17
+
+### Added
+
+- Online OpenAI model pricing provider with official public model-catalog parsing.
+- Local pricing fallback and `pricing_cache.json` with a 24-hour freshness window.
+- Model alias mapping for GPT-5.6 and Codex model names.
+- Token Cost Calculator page with current-session cost breakdown.
+- `pricing_versions` SQLite migration and Settings refresh control.
+- Actual monthly token total shown alongside the monthly usage forecast.
+
+### Safety
+
+- Pricing requests use a fixed public URL and never include Codex credentials or usage data.
+- Models without a complete cached-input price are shown as unavailable rather than estimated.
+
 ## [0.5.1] - 2026-07-17
 
 ### Fixed

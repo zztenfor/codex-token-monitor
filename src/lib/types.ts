@@ -62,6 +62,7 @@ export interface DashboardData {
   currentSession: CurrentSession | null;
   chart: UsagePoint[];
   projects: ProjectUsage[];
+  monthlyTotalTokens: number;
   projectedMonthlyTokens: number;
   dailyAverageTokens: number;
   riskLevel: "low" | "medium" | "high" | "insufficient";

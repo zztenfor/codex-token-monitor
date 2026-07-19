@@ -1,6 +1,6 @@
 [package]
 name = "codex-token-monitor"
-version = "0.5.1"
+version = "0.6.0"
 description = "Local-first Codex token usage monitor"
 authors = ["Codex Token Monitor Contributors"]
 license = "MIT"
