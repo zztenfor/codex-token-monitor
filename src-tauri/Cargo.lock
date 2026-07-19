@@ -504,7 +504,7 @@ dependencies = [
 
 [[package]]
 name = "codex-token-monitor"
-version = "0.6.0"
+version = "0.6.1"
 dependencies = [
  "chrono",
  "csv",
