@@ -1,7 +1,7 @@
 use crate::{
     domain::models::{
-        AppSettings, CurrentSession, DashboardData, ProjectUsage, QuotaWindow, RealAccountQuota,
-        RealQuotaWindow, TokenTotals, UsageEvent, UsagePoint,
+        AppSettings, CurrentSession, DashboardData, ModelUsage, ProjectUsage, QuotaWindow,
+        RealAccountQuota, RealQuotaWindow, TokenTotals, UsageEvent, UsagePoint,
     },
     error::{AppError, AppResult},
     infrastructure::codex::parser::SessionContext,
@@ -254,6 +254,7 @@ impl Database {
                 })
             })?
             .collect::<Result<Vec<_>, _>>()?;
+        let model_usage = self.model_usage(range_days)?;
         let seven_day_total: i64 = self.connection.query_row("SELECT COALESCE(SUM(total_tokens),0) FROM daily_usage WHERE usage_date >= date('now','localtime','-6 days')", [], |row| row.get(0))?;
         let daily_average_tokens = seven_day_total / 7;
         let now = Local::now();
@@ -298,6 +299,7 @@ impl Database {
             current_session,
             chart,
             projects,
+            model_usage,
             monthly_total_tokens: month_used,
             projected_monthly_tokens,
             daily_average_tokens,
@@ -446,6 +448,49 @@ impl Database {
                 }
             })
             .collect())
+    }
+
+    fn model_usage(&self, range_days: i64) -> AppResult<Vec<ModelUsage>> {
+        let days = range_days.clamp(1, 30);
+        let mut models = Vec::new();
+        let mut statement = if days == 1 {
+            self.connection.prepare("SELECT COALESCE(model,''),SUM(input_tokens),SUM(cached_input_tokens),SUM(output_tokens),SUM(reasoning_output_tokens),SUM(total_tokens) FROM usage_events WHERE date(timestamp,'localtime')=date('now','localtime') GROUP BY model ORDER BY SUM(total_tokens) DESC")?
+        } else {
+            let modifier = format!("-{} days", days - 1);
+            let mut statement = self.connection.prepare("SELECT COALESCE(model,''),SUM(input_tokens),SUM(cached_input_tokens),SUM(output_tokens),SUM(reasoning_output_tokens),SUM(total_tokens) FROM usage_events WHERE date(timestamp,'localtime') >= date('now','localtime',?1) GROUP BY model ORDER BY SUM(total_tokens) DESC")?;
+            let rows = statement.query_map([modifier], |row| {
+                Ok(ModelUsage {
+                    model: row.get(0)?,
+                    totals: TokenTotals {
+                        input_tokens: row.get(1)?,
+                        cached_input_tokens: row.get(2)?,
+                        output_tokens: row.get(3)?,
+                        reasoning_output_tokens: row.get(4)?,
+                        total_tokens: row.get(5)?,
+                    },
+                })
+            })?;
+            for row in rows {
+                models.push(row?);
+            }
+            return Ok(models);
+        };
+        let rows = statement.query_map([], |row| {
+            Ok(ModelUsage {
+                model: row.get(0)?,
+                totals: TokenTotals {
+                    input_tokens: row.get(1)?,
+                    cached_input_tokens: row.get(2)?,
+                    output_tokens: row.get(3)?,
+                    reasoning_output_tokens: row.get(4)?,
+                    total_tokens: row.get(5)?,
+                },
+            })
+        })?;
+        for row in rows {
+            models.push(row?);
+        }
+        Ok(models)
     }
 
     pub fn export_csv(&self, path: &Path) -> AppResult<usize> {
@@ -639,6 +684,9 @@ mod tests {
         assert_eq!(dashboard.weekly_quota.consumed_tokens, 500);
         assert_ne!(dashboard.five_hour_quota.forecast_status, "unconfigured");
         assert_eq!(dashboard.monthly_total_tokens, 500);
+        assert_eq!(dashboard.model_usage.len(), 1);
+        assert_eq!(dashboard.model_usage[0].model, "gpt-codex");
+        assert_eq!(dashboard.model_usage[0].totals.total_tokens, 500);
     }
 
     #[test]

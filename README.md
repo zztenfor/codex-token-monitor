@@ -17,7 +17,7 @@ Download the latest Windows installer from [GitHub Releases](../../releases). Ex
 - Disjoint input, cached input, output, reasoning output, and total token accounting
 - Token breakdown percentages with a proportional usage bar
 - Configurable rolling 5-hour and 7-day quota windows, reset times, and forecasts
-- Official Codex account quota sync from the current file-based login, refreshed every 15 minutes
+- Official Codex account quota sync from the current file-based login, refreshed every 5 minutes and immediately applied when a new snapshot arrives
 - Current session context usage and 1/7/30 day charts
 - Anonymous project ranking and seven-day monthly projection
 - 1, 5, 10, or 30 second filesystem reconciliation
@@ -103,7 +103,7 @@ Quota limits are local token budgets configured in Settings. Their defaults are 
 
 The first release supports `zh-CN` and `en-US`. The selected language is stored inside the existing SQLite `settings` record as `language`, so older databases receive a system-language default without a destructive migration. The React UI, floating widget, tray menu, tooltips, error messages, and Windows notifications follow the selected language immediately. Add a future language by adding a locale JSON file under `src/i18n/locales`, registering it in `src/i18n/index.ts`, and adding its language code to the supported-language list; native tray and notification strings are maintained in `src-tauri/src/i18n.rs`.
 
-Floating-window preferences are stored in the same settings JSON: `floatingOpacity` (0.2-1.0), `floatingAlwaysOnTop`, `floatingClickThrough`, and `floatingMode` (`compact` or `detailed`). Tauri's current Window API does not expose runtime `setOpacity`, so opacity is applied immediately as a CSS fallback while always-on-top, click-through, dragging, and mode resizing use native Window APIs.
+Floating-window preferences are stored in the same settings JSON: `floatingOpacity` (0.2-1.0), `floatingAlwaysOnTop`, `floatingClickThrough`, and `floatingMode` (`auto`, `compact`, `detailed`, or `orb`). In `auto` mode the widget expands on hover and preserves its dragged position, moving inward only when the expanded content would cross a monitor work-area edge. Tauri's current Window API does not expose runtime `setOpacity`, so opacity is applied immediately as a CSS fallback while always-on-top, click-through, dragging, and mode resizing use native Window APIs.
 
 Official quota sync currently reads file-based credentials from `%USERPROFILE%\.codex\auth.json`. Codex installations configured to store credentials only in the Windows credential manager are not yet supported. The service accepts nested and legacy token fields and classifies returned windows by their declared duration. If the account endpoint omits the 5-hour or weekly window, the UI reports that window as unavailable instead of substituting an estimate.
 

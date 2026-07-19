@@ -1,7 +1,7 @@
 import { listen } from "@tauri-apps/api/event";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { ExternalLink, GripHorizontal, Pause, Play, X } from "lucide-react";
-import { useCallback, useEffect, useState, type CSSProperties, type MouseEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type CSSProperties, type MouseEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { normalizeLanguage } from "../i18n";
 import { formatDuration, formatTokens, shortSession } from "../lib/format";
@@ -12,7 +12,7 @@ const defaultFloatingSettings: FloatingWindowSettings = {
   floatingOpacity: 0.85,
   floatingAlwaysOnTop: true,
   floatingClickThrough: false,
-  floatingMode: "compact",
+  floatingMode: "auto",
 };
 
 export function FloatingWidget() {
@@ -21,6 +21,8 @@ export function FloatingWidget() {
   const [settings, setSettings] = useState<FloatingWindowSettings>(defaultFloatingSettings);
   const [darkTheme, setDarkTheme] = useState(false);
   const [now, setNow] = useState(Date.now());
+  const [hovered, setHovered] = useState(false);
+  const collapseTimer = useRef<number | null>(null);
   const load = useCallback(() => api.dashboard(1).then(setData).catch(() => undefined), []);
   const session = data?.currentSession;
   const percent = Math.min(session?.usagePercent ?? 0, 100);
@@ -47,9 +49,11 @@ export function FloatingWidget() {
     const refreshTimer = window.setInterval(() => void load(), 5000);
     const clockTimer = window.setInterval(() => setNow(Date.now()), 1000);
     let stopUsage: (() => void) | undefined;
+    let stopQuota: (() => void) | undefined;
     let stopLanguage: (() => void) | undefined;
     let stopFloating: (() => void) | undefined;
     listen("usage-updated", () => void load()).then((unlisten) => (stopUsage = unlisten));
+    listen("account-quota-updated", () => void load()).then((unlisten) => (stopQuota = unlisten));
     listen<string>("language-changed", (event) => void i18n.changeLanguage(normalizeLanguage(event.payload))).then((unlisten) => (stopLanguage = unlisten));
     listen<FloatingWindowSettings>("floating-settings-changed", (event) => setSettings(event.payload)).then((unlisten) => (stopFloating = unlisten));
     return () => {
@@ -58,6 +62,7 @@ export function FloatingWidget() {
       window.clearInterval(refreshTimer);
       window.clearInterval(clockTimer);
       stopUsage?.();
+      stopQuota?.();
       stopLanguage?.();
       stopFloating?.();
     };
@@ -82,6 +87,22 @@ export function FloatingWidget() {
   const fiveHour = data?.realAccountQuota.fiveHour;
   const weekly = data?.realAccountQuota.weekly;
   const widgetOpacity = Math.min(Math.max(settings.floatingOpacity, 0.2), 1);
+  const expanded = settings.floatingMode === "detailed" || (settings.floatingMode === "auto" && hovered);
+  const showDetailed = settings.floatingMode === "detailed" || (settings.floatingMode === "auto" && expanded);
+  const handleMouseEnter = () => {
+    if (settings.floatingMode !== "auto") return;
+    window.clearTimeout(collapseTimer.current ?? undefined);
+    setHovered(true);
+  };
+  const handleMouseLeave = () => {
+    if (settings.floatingMode !== "auto") return;
+    window.clearTimeout(collapseTimer.current ?? undefined);
+    collapseTimer.current = window.setTimeout(() => setHovered(false), 1500);
+  };
+  useEffect(() => {
+    if (settings.floatingMode === "auto") void api.setFloatingWindowExpanded(showDetailed).catch(() => undefined);
+    return () => window.clearTimeout(collapseTimer.current ?? undefined);
+  }, [settings.floatingMode, showDetailed]);
   const widgetStyles = {
     "--bg": "transparent",
     "--surface": darkTheme ? `rgba(29, 35, 42, ${widgetOpacity})` : `rgba(255, 255, 255, ${widgetOpacity})`,
@@ -90,7 +111,7 @@ export function FloatingWidget() {
   } as CSSProperties;
 
   return (
-    <main className={`floating-widget ${settings.floatingMode}`} style={widgetStyles} onDoubleClick={openOnDoubleClick}>
+    <main className={`floating-widget ${settings.floatingMode} ${expanded ? "expanded" : "collapsed"}`} style={widgetStyles} onDoubleClick={openOnDoubleClick} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
       <header data-tauri-drag-region onMouseDown={startDragging}>
         <div className="widget-brand" data-tauri-drag-region><span className="widget-mark">C</span><strong>{t("app.name")}</strong></div>
         <GripHorizontal className="drag-handle" size={17} data-tauri-drag-region />
@@ -100,7 +121,15 @@ export function FloatingWidget() {
         </div>
       </header>
 
-      {settings.floatingMode === "compact" ? <section className="widget-compact">
+      {settings.floatingMode === "orb" ? <section className="widget-orb" data-tauri-drag-region onMouseDown={startDragging}>
+        <span className="widget-orb-mark">C</span>
+        <strong>{tokens(data?.today.totalTokens ?? 0)}</strong>
+        <small>{quotaText(fiveHour)}</small>
+      </section> : settings.floatingMode === "auto" && !expanded ? <section className="widget-collapsed" data-tauri-drag-region onMouseDown={startDragging}>
+        <span className="widget-collapsed-mark">C</span>
+        <div className="widget-collapsed-total"><span>{t("widget.todayTotal")}</span><strong>{tokens(data?.today.totalTokens ?? 0)}</strong></div>
+        <div className="widget-collapsed-quota"><span><b>{t("widget.fiveHourShort")}</b>{quotaText(fiveHour)}</span><span><b>{t("widget.weeklyShort")}</b>{quotaText(weekly)}</span></div>
+      </section> : settings.floatingMode === "compact" ? <section className="widget-compact">
         <div className="widget-compact-total"><span>{t("widget.todayTotal")}</span><strong>{tokens(data?.today.totalTokens ?? 0)}</strong></div>
         <div className="widget-compact-quota"><span><b>{t("widget.fiveHourShort")}</b>{quotaText(fiveHour)}</span><span><b>{t("widget.weeklyShort")}</b>{quotaText(weekly)}</span></div>
         <div className="widget-compact-model">{session?.model || t("widget.waiting")}</div>
@@ -133,13 +162,13 @@ export function FloatingWidget() {
         </section>
         <section className="widget-block">
           <div className="widget-block-title">{t("widget.quotaStatus")}</div>
-          <div className="widget-quota-grid">{([[t("widget.fiveHourWindow"), fiveHour], [t("widget.weeklyWindow"), weekly]] as Array<[string, RealQuotaWindow | null | undefined]>).map(([title, window]) => <div className="widget-quota" key={title}><strong>{title}</strong><span><b>{t("widget.used")}</b>{quotaText(window)}</span><span><b>{t("widget.remaining")}</b>{window ? `${window.remainingPercent.toFixed(0)}%` : t("common.notAvailable")}</span><span><b>{t("widget.reset")}</b>{quotaReset(window)}</span></div>)}</div>
+          <div className="widget-quota-grid">{([[t("widget.fiveHourWindow"), fiveHour], [t("widget.weeklyWindow"), weekly]] as Array<[string, RealQuotaWindow | null | undefined]>).map(([title, window]) => <div className="widget-quota" key={title}><strong>{title}</strong><span><b>{t("widget.used")}</b>{quotaText(window)}</span><span><b>{t("widget.remaining")}</b>{window ? `${window.remainingPercent.toFixed(0)}%` : t("common.notAvailable")}</span><span><b>{t("widget.reset", { duration: quotaReset(window) })}</b></span></div>)}</div>
         </section>
         <section className="widget-today"><span>{t("widget.todayTotal")}</span><strong>{tokens(data?.today.totalTokens ?? 0)} {t("widget.tokens")}</strong></section>
       </section>}
 
       {settings.floatingMode === "compact" && <div className="widget-compact-context"><span>{session?.model || t("widget.waiting")}</span><strong>{session?.usagePercent == null ? t("common.notAvailable") : `${percent.toFixed(0)}%`}</strong></div>}
-      <footer className="widget-footer"><span>{t("widget.lastSync")}</span><strong>{syncAge == null ? t("widget.notSynced") : t("widget.secondsAgo", { count: syncAge })}</strong><button className="widget-pause" onClick={() => void pause()} title={data?.syncPaused ? t("widget.resume") : t("widget.pause")} aria-label={data?.syncPaused ? t("widget.resume") : t("widget.pause")}>{data?.syncPaused ? <Play size={14} /> : <Pause size={14} />}</button></footer>
+      {settings.floatingMode !== "auto" || expanded ? <footer className="widget-footer"><span>{t("widget.lastSync")}</span><strong>{syncAge == null ? t("widget.notSynced") : t("widget.secondsAgo", { count: syncAge })}</strong><button className="widget-pause" onClick={() => void pause()} title={data?.syncPaused ? t("widget.resume") : t("widget.pause")} aria-label={data?.syncPaused ? t("widget.resume") : t("widget.pause")}>{data?.syncPaused ? <Play size={14} /> : <Pause size={14} />}</button></footer> : null}
     </main>
   );
 }

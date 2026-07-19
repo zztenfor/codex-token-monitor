@@ -151,7 +151,7 @@ fn start_quota_worker(app: tauri::AppHandle) {
         if let Err(error) = perform_account_quota_sync(&app) {
             tracing::warn!(%error, "quota worker persistence failed");
         }
-        thread::sleep(Duration::from_secs(15 * 60));
+        thread::sleep(Duration::from_secs(5 * 60));
     });
 }
 
@@ -216,6 +216,7 @@ pub fn run() {
             commands::clear_usage_data,
             commands::detect_codex_path,
             commands::toggle_floating_window,
+            commands::set_floating_window_expanded,
             commands::hide_floating_window,
             commands::open_main_window
         ])

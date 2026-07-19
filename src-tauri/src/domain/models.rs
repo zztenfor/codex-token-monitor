@@ -99,11 +99,20 @@ pub struct ProjectUsage {
 
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
+pub struct ModelUsage {
+    pub model: String,
+    #[serde(flatten)]
+    pub totals: TokenTotals,
+}
+
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct DashboardData {
     pub today: TokenTotals,
     pub current_session: Option<CurrentSession>,
     pub chart: Vec<UsagePoint>,
     pub projects: Vec<ProjectUsage>,
+    pub model_usage: Vec<ModelUsage>,
     pub monthly_total_tokens: i64,
     pub projected_monthly_tokens: i64,
     pub daily_average_tokens: i64,
@@ -192,7 +201,7 @@ impl Default for AppSettings {
             floating_opacity: 0.85,
             floating_always_on_top: true,
             floating_click_through: false,
-            floating_mode: "compact".into(),
+            floating_mode: "auto".into(),
             daily_budget: 0,
             monthly_budget: 0,
             five_hour_limit: quota.five_hour_limit,

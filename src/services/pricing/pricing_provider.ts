@@ -27,6 +27,7 @@ export interface PricingProvider {
 export const MODEL_ALIASES: Record<string, string> = {
   "gpt-5.6-codex": "gpt-5.6",
   "gpt-5.6-sol": "gpt-5.6",
+  "gpt-5.5-codex": "gpt-5.5",
   "gpt-5-codex": "gpt-5",
   "gpt-5.1-codex": "gpt-5.1",
 };

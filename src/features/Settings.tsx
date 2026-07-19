@@ -145,8 +145,10 @@ export function Settings({ settings, pricing, pricingLoading, onRefreshPricing, 
       <h2>{t("settings.floatingWindow")}</h2>
       <label>{t("settings.floatingMode")}</label>
       <select value={form.floatingMode} onChange={(event) => void updateFloating("floatingMode", event.target.value as FloatingMode)}>
+        <option value="auto">{t("settings.autoCollapseMode")}</option>
         <option value="compact">{t("settings.compactMode")}</option>
         <option value="detailed">{t("settings.detailedMode")}</option>
+        <option value="orb">{t("settings.orbMode")}</option>
       </select>
       <label htmlFor="floating-opacity">{t("settings.opacity")} {Math.round(form.floatingOpacity * 100)}%</label>
       <input id="floating-opacity" type="range" min="20" max="100" step="10" value={Math.round(form.floatingOpacity * 100)} onChange={(event) => void updateFloating("floatingOpacity", Number(event.target.value) / 100)} />

@@ -194,7 +194,7 @@ fn validate_settings(settings: &AppSettings) -> AppResult<()> {
     if !settings.floating_opacity.is_finite() || !(0.2..=1.0).contains(&settings.floating_opacity) {
         return Err(AppError::InvalidSetting("Floating opacity must be between 0.2 and 1.0".into()));
     }
-    if !["compact", "detailed"].contains(&settings.floating_mode.as_str()) {
+    if !["auto", "compact", "detailed", "orb"].contains(&settings.floating_mode.as_str()) {
         return Err(AppError::InvalidSetting("Unknown floating window mode".into()));
     }
     if settings.daily_budget < 0
@@ -366,10 +366,11 @@ pub fn apply_floating_window_settings(app: &AppHandle, settings: &AppSettings) -
     if let Err(error) = window.set_ignore_cursor_events(settings.floating_click_through) {
         tracing::warn!(%error, "floating click-through is unavailable");
     }
-    let size = if settings.floating_mode == "detailed" {
-        tauri::Size::Logical(tauri::LogicalSize::new(468.0, 480.0))
-    } else {
-        tauri::Size::Logical(tauri::LogicalSize::new(320.0, 176.0))
+    let size = match settings.floating_mode.as_str() {
+        "detailed" => tauri::Size::Logical(tauri::LogicalSize::new(468.0, 480.0)),
+        "orb" => tauri::Size::Logical(tauri::LogicalSize::new(88.0, 88.0)),
+        "auto" => tauri::Size::Logical(tauri::LogicalSize::new(320.0, 78.0)),
+        _ => tauri::Size::Logical(tauri::LogicalSize::new(320.0, 176.0)),
     };
     if let Err(error) = window.set_size(size) {
         tracing::warn!(%error, "floating window resize is unavailable");
@@ -448,6 +449,72 @@ pub fn toggle_floating_window(app: AppHandle) -> AppResult<bool> {
     window.show().map_err(window_error)?;
     window.set_focus().map_err(window_error)?;
     Ok(true)
+}
+
+#[tauri::command]
+pub fn set_floating_window_expanded(app: AppHandle, expanded: bool) -> AppResult<()> {
+    let window = app
+        .get_webview_window("widget")
+        .ok_or_else(|| AppError::Other("Floating window is unavailable".into()))?;
+    let (logical_width, logical_height) = if expanded { (468.0, 480.0) } else { (320.0, 78.0) };
+    resize_widget_to_work_area(&window, logical_width, logical_height, expanded)
+}
+
+fn resize_widget_to_work_area(
+    window: &tauri::WebviewWindow,
+    logical_width: f64,
+    logical_height: f64,
+    expanding: bool,
+) -> AppResult<()> {
+    let scale = window.scale_factor().map_err(window_error)?;
+    let desired_width = (logical_width * scale).round() as u32;
+    let desired_height = (logical_height * scale).round() as u32;
+    let current_position = window.outer_position().map_err(window_error)?;
+    let current_size = window.outer_size().map_err(window_error)?;
+    let monitor = window
+        .current_monitor()
+        .map_err(window_error)?
+        .or(window.primary_monitor().map_err(window_error)?);
+
+    let Some(monitor) = monitor else {
+        return window
+            .set_size(tauri::Size::Logical(tauri::LogicalSize::new(logical_width, logical_height)))
+            .map_err(window_error);
+    };
+    let monitor_position = monitor.position();
+    let monitor_size = monitor.size();
+    let left = monitor_position.x;
+    let top = monitor_position.y;
+    let right = left.saturating_add(monitor_size.width as i32);
+    let bottom = top.saturating_add(monitor_size.height as i32);
+    let max_x = right.saturating_sub(desired_width as i32);
+    let max_y = bottom.saturating_sub(desired_height as i32);
+    let clamp = |value: i32, min: i32, max: i32| {
+        if max < min { min } else { value.clamp(min, max) }
+    };
+    let near_right_edge = current_position.x.saturating_add(current_size.width as i32) >= right.saturating_sub(24);
+    let near_bottom_edge = current_position.y.saturating_add(current_size.height as i32) >= bottom.saturating_sub(24);
+    // Keep the user's dragged position. Reposition only when the resized window
+    // would leave the monitor work area, or when collapsing a window that was
+    // already anchored to an edge.
+    let overflows_right = current_position.x.saturating_add(desired_width as i32) > right;
+    let overflows_bottom = current_position.y.saturating_add(desired_height as i32) > bottom;
+    let x = if overflows_right || (!expanding && near_right_edge) {
+        clamp(right.saturating_sub(desired_width as i32), left, max_x)
+    } else {
+        clamp(current_position.x, left, max_x)
+    };
+    let y = if overflows_bottom || (!expanding && near_bottom_edge) {
+        clamp(bottom.saturating_sub(desired_height as i32), top, max_y)
+    } else {
+        clamp(current_position.y, top, max_y)
+    };
+    window
+        .set_position(tauri::PhysicalPosition::new(x, y))
+        .map_err(window_error)?;
+    window
+        .set_size(tauri::Size::Logical(tauri::LogicalSize::new(logical_width, logical_height)))
+        .map_err(window_error)
 }
 
 #[tauri::command]

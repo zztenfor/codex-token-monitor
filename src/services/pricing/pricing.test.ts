@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { LocalPricingProvider } from "./local_provider";
 import { parseOfficialPricingHtml } from "./remote_provider";
 import { PricingService } from "./pricing_service";
 import type { ModelPricing, PricingCache, PricingProvider } from "./pricing_provider";
@@ -34,6 +35,16 @@ describe("online pricing provider", () => {
   it("skips models when a required price is missing", () => {
     const html = `<p>gpt-5.6-sol $5.00 $0.50</p>`;
     expect(parseOfficialPricingHtml(html)).toEqual([]);
+  });
+});
+
+describe("local pricing provider", () => {
+  it("includes the official GPT-5.5 price and Codex alias", async () => {
+    const pricing = await new LocalPricingProvider().getPricing("gpt-5.5-codex");
+    expect(pricing?.model).toBe("gpt-5.5");
+    expect(pricing?.inputPerMillion).toBe(5);
+    expect(pricing?.cachedInputPerMillion).toBe(0.5);
+    expect(pricing?.outputPerMillion).toBe(30);
   });
 });
 

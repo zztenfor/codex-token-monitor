@@ -126,9 +126,11 @@ function MainApp() {
 
   useEffect(() => {
     let stopUsage: (() => void) | undefined;
+    let stopQuota: (() => void) | undefined;
     let stopSettings: (() => void) | undefined;
     let stopLanguage: (() => void) | undefined;
     listen("usage-updated", () => void load()).then((unlisten) => (stopUsage = unlisten));
+    listen("account-quota-updated", () => void load()).then((unlisten) => (stopQuota = unlisten));
     listen("open-settings", () => setView("settings")).then((unlisten) => (stopSettings = unlisten));
     listen<string>("language-changed", (event) => {
       const language = normalizeLanguage(event.payload);
@@ -137,6 +139,7 @@ function MainApp() {
     }).then((unlisten) => (stopLanguage = unlisten));
     return () => {
       stopUsage?.();
+      stopQuota?.();
       stopSettings?.();
       stopLanguage?.();
     };
@@ -168,7 +171,7 @@ function MainApp() {
       </aside>
       <div className="content">
         {error && <div className="error-banner">{error}</div>}
-        {view === "dashboard" ? <Dashboard data={data} range={range} loading={loading} onRange={selectRange} onSync={sync} quotaLoading={quotaLoading} onQuotaSync={syncQuota} /> : view === "cost" ? <Cost data={data} pricing={pricing} onRefresh={() => void refreshPricing()} loading={pricingLoading} /> : <Settings settings={settings} pricing={pricing} pricingLoading={pricingLoading} onRefreshPricing={() => void refreshPricing()} onSaved={(next) => { setSettings(next); void load(); }} />}
+        {view === "dashboard" ? <Dashboard data={data} range={range} loading={loading} onRange={selectRange} onSync={sync} quotaLoading={quotaLoading} onQuotaSync={syncQuota} /> : view === "cost" ? <Cost data={data} pricing={pricing} range={range} onRange={selectRange} onRefresh={() => void refreshPricing()} loading={pricingLoading} /> : <Settings settings={settings} pricing={pricing} pricingLoading={pricingLoading} onRefreshPricing={() => void refreshPricing()} onSaved={(next) => { setSettings(next); void load(); }} />}
       </div>
     </div>
   );

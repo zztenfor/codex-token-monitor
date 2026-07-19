@@ -18,6 +18,18 @@ All notable changes to this project are documented here. The project follows sem
 - Pricing requests use a fixed public URL and never include Codex credentials or usage data.
 - Models without a complete cached-input price are shown as unavailable rather than estimated.
 
+### Fixed
+
+- Keep the floating window at the user's dragged position when auto-expanding.
+- Reposition the widget inward only when detailed mode would cross the current monitor's work-area edge.
+- Refresh the floating widget and Dashboard immediately after an account-quota snapshot is persisted.
+- Fix the floating-widget reset-time interpolation placeholder.
+
+### Changed
+
+- Reduce the background account-quota sync interval from 15 minutes to 5 minutes.
+- Add auto-hover and orb floating-window presets to the documented settings.
+
 ## [0.5.1] - 2026-07-17
 
 ### Fixed
