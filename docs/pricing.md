@@ -8,7 +8,7 @@ The online provider reads the public OpenAI model catalog:
 https://developers.openai.com/api/docs/pricing
 ```
 
-The Rust command uses a fixed URL, a short timeout, and no authorization header. The TypeScript provider parses the first Standard pricing table and reads model ID, Input, Cached input, and Output MTok prices. Cache-write and long-context columns are not used. The parser is intentionally conservative because the public page is not a versioned pricing API.
+The Rust command uses a fixed URL, a short timeout, and no authorization header. The TypeScript provider parses the Standard pricing table and reads model ID, Input, Cached input, and Output MTok prices. The parsed model IDs form the online model catalog, so a successful refresh updates the available model list and its prices together. Bundled models are used only as an offline fallback and are never merged into a successful online catalog. Cache-write and long-context columns are not used. The parser is intentionally conservative because the public page is not a versioned pricing API.
 
 ## Provider order
 

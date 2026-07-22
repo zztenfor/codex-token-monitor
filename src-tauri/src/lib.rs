@@ -209,6 +209,7 @@ pub fn run() {
             commands::sync_now,
             commands::sync_account_quota,
             commands::fetch_pricing_source,
+            commands::fetch_model_catalog_source,
             commands::read_pricing_cache,
             commands::save_pricing_cache,
             commands::set_sync_paused,

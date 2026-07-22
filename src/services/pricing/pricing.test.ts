@@ -67,7 +67,7 @@ describe("pricing service", () => {
     expect(service.needsSync()).toBe(false);
   });
 
-  it("adds local fallback models that are absent from the online cache", async () => {
+  it("retains bundled models when an online catalog is partial", async () => {
     const fallback = { ...onlineModel, model: "gpt-5.4", modelAlias: "gpt-5.4", source: "local" as const };
     const cached: PricingCache = { updated_at: new Date().toISOString(), version: "today", source: "online", models: [onlineModel] };
     const service = new PricingService(provider([]), provider([fallback]), store(cached));

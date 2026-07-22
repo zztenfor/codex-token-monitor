@@ -38,6 +38,7 @@ impl AppState {
 }
 
 const PRICING_SOURCE_URL: &str = "https://developers.openai.com/api/docs/pricing";
+const MODEL_CATALOG_SOURCE_URL: &str = "https://developers.openai.com/api/docs/models/all";
 
 #[tauri::command]
 pub async fn fetch_pricing_source() -> AppResult<String> {
@@ -62,6 +63,19 @@ pub async fn fetch_pricing_source() -> AppResult<String> {
         return Err(AppError::Other("Pricing source is too large".into()));
     }
     Ok(body)
+}
+
+#[tauri::command]
+pub async fn fetch_model_catalog_source() -> AppResult<String> {
+    let response = reqwest::Client::builder()
+        .connect_timeout(std::time::Duration::from_secs(10))
+        .timeout(std::time::Duration::from_secs(20))
+        .user_agent("Codex Token Monitor")
+        .build().map_err(|_| AppError::Other("Model catalog unavailable".into()))?
+        .get(MODEL_CATALOG_SOURCE_URL).send().await
+        .map_err(|_| AppError::Other("Model catalog unavailable".into()))?;
+    if !response.status().is_success() { return Err(AppError::Other("Model catalog unavailable".into())); }
+    response.text().await.map_err(|_| AppError::Other("Model catalog unavailable".into()))
 }
 
 #[tauri::command]
