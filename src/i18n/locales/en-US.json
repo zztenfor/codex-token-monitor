@@ -47,6 +47,16 @@
     "currentModel": "Current Model",
     "noSession": "No active session",
     "currentSessionEstimate": "Current session estimate",
+    "cumulativeTitle": "Cumulative Token Cost",
+    "cumulativeSubtitle": "Calculated from the selected usage history",
+    "cumulativeEstimate": "Cumulative estimate · {{range}}",
+    "cumulativeTokens": "cumulative tokens",
+    "modelsCount": "{{count}} models",
+    "cumulativeBreakdown": "Cumulative Cost Breakdown",
+    "cumulativeBreakdownSubtitle": "Calculated by model using current prices",
+    "unknownModel": "Unknown model",
+    "noCumulativeUsage": "No cumulative usage yet",
+    "partialPricingWarning": "{{count}} models have no price and were excluded from the cumulative cost",
     "breakdown": "Cost Breakdown",
     "reasoningIncluded": "Reasoning output is charged at the output-token rate",
     "modelPricing": "Model Pricing",
@@ -152,8 +162,10 @@
     "clearConfirm": "Clear all synchronized token statistics? Settings will be preserved."
     ,"floatingWindow": "Floating Window"
     ,"floatingMode": "Window Mode"
+    ,"autoCollapseMode": "Auto collapse on hover"
     ,"compactMode": "Compact"
     ,"detailedMode": "Detailed"
+    ,"orbMode": "Floating orb"
     ,"opacity": "Opacity"
     ,"alwaysOnTop": "Always On Top"
     ,"clickThrough": "Enable Click Through"

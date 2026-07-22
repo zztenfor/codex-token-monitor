@@ -47,6 +47,16 @@
     "currentModel": "\u5f53\u524d\u6a21\u578b",
     "noSession": "\u6682\u65e0\u6d3b\u8dc3 Session",
     "currentSessionEstimate": "\u5f53\u524d Session \u4f30\u7b97",
+    "cumulativeTitle": "\u7d2f\u8ba1 Token \u8d39\u7528",
+    "cumulativeSubtitle": "\u6309\u6240\u9009\u7528\u91cf\u5386\u53f2\u8ba1\u7b97",
+    "cumulativeEstimate": "\u7d2f\u8ba1\u4f30\u7b97 \u00b7 {{range}}",
+    "cumulativeTokens": "\u7d2f\u8ba1 Token",
+    "modelsCount": "{{count}} \u4e2a\u6a21\u578b",
+    "cumulativeBreakdown": "\u7d2f\u8ba1\u8d39\u7528\u660e\u7ec6",
+    "cumulativeBreakdownSubtitle": "\u6309\u6a21\u578b\u548c\u5f53\u524d\u4ef7\u683c\u8ba1\u7b97",
+    "unknownModel": "\u672a\u77e5\u6a21\u578b",
+    "noCumulativeUsage": "\u6682\u65e0\u7d2f\u8ba1\u7528\u91cf",
+    "partialPricingWarning": "{{count}} \u4e2a\u6a21\u578b\u7f3a\u5c11\u4ef7\u683c，\u5df2\u4ece\u7d2f\u8ba1\u8d39\u7528\u4e2d\u6392\u9664",
     "breakdown": "\u8d39\u7528\u660e\u7ec6",
     "reasoningIncluded": "\u63a8\u7406\u8f93\u51fa\u6309\u8f93\u51fa Token \u4ef7\u683c\u8ba1\u7b97",
     "modelPricing": "\u6a21\u578b\u4ef7\u683c",
@@ -152,8 +162,10 @@
     "clearConfirm": "确定清除所有已同步的 Token 统计吗？设置不会被删除。"
     ,"floatingWindow": "悬浮窗"
     ,"floatingMode": "窗口模式"
+    ,"autoCollapseMode": "悬停自动展开"
     ,"compactMode": "简洁模式"
     ,"detailedMode": "详细模式"
+    ,"orbMode": "悬浮球"
     ,"opacity": "透明度"
     ,"alwaysOnTop": "始终置顶"
     ,"clickThrough": "启用鼠标穿透"

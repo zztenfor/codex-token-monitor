@@ -8,6 +8,7 @@ export const api = {
   syncNow: () => invoke<SyncReport>("sync_now"),
   syncAccountQuota: () => invoke<RealAccountQuota>("sync_account_quota"),
   fetchPricingSource: () => invoke<string>("fetch_pricing_source"),
+  fetchModelCatalogSource: () => invoke<string>("fetch_model_catalog_source"),
   readPricingCache: () => invoke<string | null>("read_pricing_cache"),
   savePricingCache: (cacheJson: string) => invoke<void>("save_pricing_cache", { cacheJson }),
   setPaused: (paused: boolean) => invoke<boolean>("set_sync_paused", { paused }),
@@ -15,6 +16,7 @@ export const api = {
   clearData: () => invoke<void>("clear_usage_data"),
   detectCodexPath: () => invoke<string>("detect_codex_path"),
   toggleWidget: () => invoke<boolean>("toggle_floating_window"),
+  setFloatingWindowExpanded: (expanded: boolean) => invoke<void>("set_floating_window_expanded", { expanded }),
   hideWidget: () => invoke<void>("hide_floating_window"),
   openMain: () => invoke<void>("open_main_window"),
 };

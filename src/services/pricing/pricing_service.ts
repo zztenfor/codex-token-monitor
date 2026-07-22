@@ -91,9 +91,13 @@ export class PricingService {
   }
 
   private async applyCache(cache: PricingCache) {
-    const fallbackModels = await this.local.getModels();
-    const models = new Map(fallbackModels.map((model) => [model.model, model]));
-    for (const model of cache.models) models.set(model.model, model);
+    // Keep the online result authoritative, but retain bundled entries that
+    // the public page failed to expose during a transient/partial update.
+    // This prevents newly shipped models (for example GPT-5.6) disappearing
+    // from the calculator while still preferring online prices whenever they
+    // exist.
+    const models = new Map((await this.local.getModels()).map((model) => [model.model, model]));
+    for (const model of cache.models) models.set(model.model, { ...model });
     this.snapshot = {
       models: [...models.values()],
       updatedAt: cache.updated_at,

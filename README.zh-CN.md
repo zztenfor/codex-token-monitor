@@ -32,7 +32,7 @@ Codex Token Monitor 是一个面向 Windows 10/11 的本地优先桌面工具，
 
 真实账号额度功能仅向 `https://chatgpt.com/backend-api/wham/usage` 发起只读请求。`auth.json` 中的访问令牌和账号 ID 只在内存中使用，不写入数据库、CSV 或日志。关闭额度同步或接口不可用时，本地统计仍可正常工作。详见 [隐私模型](docs/privacy-model.md)。
 
-价格同步仅向 `https://developers.openai.com/api/docs/pricing` 发起不带认证信息的公开 GET 请求，不会发送账号、Token 用量、Session 或项目数据。价格在本机缓存 24 小时；字段不完整时显示“价格不可用”，不会猜测价格。
+价格同步仅向 `https://developers.openai.com/api/docs/pricing` 发起不带认证信息的公开 GET 请求，不会发送账号、Token 用量、Session 或项目数据。每次成功同步会同时更新官方页面中当前可定价的模型目录及其价格，本地内置模型仅在离线时兜底，不会混入在线目录。结果在本机缓存 24 小时；字段不完整时显示“价格不可用”，不会猜测价格。
 
 ## 开发环境
 

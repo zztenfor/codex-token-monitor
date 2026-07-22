@@ -6,6 +6,7 @@ import { translateError } from "../i18n/errors";
 import { api } from "../lib/tauri";
 import type { AppSettings, FloatingMode, Language } from "../lib/types";
 import type { PricingSnapshot } from "../services/pricing";
+import type { DashboardData } from "../lib/types";
 
 interface Props {
   settings: AppSettings;
@@ -13,9 +14,13 @@ interface Props {
   pricingLoading: boolean;
   onRefreshPricing: () => void;
   onSaved: (settings: AppSettings) => void;
+  data: DashboardData | null;
+  onRescanModels: () => void;
+  modelScanning: boolean;
+  onTestMatching: () => void;
 }
 
-export function Settings({ settings, pricing, pricingLoading, onRefreshPricing, onSaved }: Props) {
+export function Settings({ settings, pricing, pricingLoading, onRefreshPricing, onSaved, data, onRescanModels, modelScanning, onTestMatching }: Props) {
   const { t, i18n } = useTranslation();
   const [form, setForm] = useState(settings);
   const [status, setStatus] = useState("");
@@ -101,6 +106,9 @@ export function Settings({ settings, pricing, pricingLoading, onRefreshPricing, 
       <h2>{t("settings.pricing")}</h2>
       <div className="pricing-settings-row"><div><strong>{pricing.source === "online" ? t("pricing.online") : pricing.source === "local" ? t("pricing.localFallback") : t("pricing.unavailable")}</strong><small>{t("pricing.lastUpdated")}: {pricing.updatedAt ? new Date(pricing.updatedAt).toLocaleString(i18n.resolvedLanguage ?? i18n.language) : t("pricing.never")}</small></div><button className="icon-button" onClick={onRefreshPricing} disabled={pricingLoading} title={t("pricing.refreshNow")} aria-label={t("pricing.refreshNow")}><RefreshCw size={18} className={pricingLoading ? "spin" : ""} /></button></div>
       <small>{pricing.error ? t("pricing.refreshFailed") : t("settings.pricingDescription")}</small>
+      <h2 style={{ marginTop: 24 }}>模型管理</h2>
+      <div className="pricing-settings-row"><div><strong>模型发现</strong><small>来源：Token 使用历史、Codex 日志与价格数据库</small></div><div><button className="button" onClick={onRescanModels} disabled={modelScanning}>{modelScanning ? "扫描中…" : "重新扫描模型"}</button> <button className="button" onClick={onTestMatching}>测试价格匹配</button></div></div>
+      <div className="pricing-table" style={{ marginTop: 12 }}><div className="pricing-row pricing-header"><span>模型名称</span><span>Token 数量</span><span>价格状态</span></div>{(data?.modelUsage ?? []).map((model) => { const matched = pricing.models.some((price) => price.model === model.model || price.modelAlias === model.model || price.model === model.model.split("-").slice(0, 2).join("-")); return <div className="pricing-row" key={model.model || "unknown"}><strong>{model.model || "unknown"}</strong><span>{model.totalTokens.toLocaleString()}</span><span>{matched ? "已匹配" : "等待价格匹配"}</span></div>; })}</div>
     </section>
 
     <section className="settings-section">
@@ -145,8 +153,10 @@ export function Settings({ settings, pricing, pricingLoading, onRefreshPricing, 
       <h2>{t("settings.floatingWindow")}</h2>
       <label>{t("settings.floatingMode")}</label>
       <select value={form.floatingMode} onChange={(event) => void updateFloating("floatingMode", event.target.value as FloatingMode)}>
+        <option value="auto">{t("settings.autoCollapseMode")}</option>
         <option value="compact">{t("settings.compactMode")}</option>
         <option value="detailed">{t("settings.detailedMode")}</option>
+        <option value="orb">{t("settings.orbMode")}</option>
       </select>
       <label htmlFor="floating-opacity">{t("settings.opacity")} {Math.round(form.floatingOpacity * 100)}%</label>
       <input id="floating-opacity" type="range" min="20" max="100" step="10" value={Math.round(form.floatingOpacity * 100)} onChange={(event) => void updateFloating("floatingOpacity", Number(event.target.value) / 100)} />

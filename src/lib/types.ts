@@ -1,6 +1,6 @@
 export type Theme = "system" | "light" | "dark";
 export type Language = "zh-CN" | "en-US";
-export type FloatingMode = "compact" | "detailed";
+export type FloatingMode = "auto" | "compact" | "detailed" | "orb";
 
 export interface TokenTotals {
   inputTokens: number;
@@ -57,11 +57,16 @@ export interface ProjectUsage {
   totalTokens: number;
 }
 
+export interface ModelUsage extends TokenTotals {
+  model: string;
+}
+
 export interface DashboardData {
   today: TokenTotals;
   currentSession: CurrentSession | null;
   chart: UsagePoint[];
   projects: ProjectUsage[];
+  modelUsage: ModelUsage[];
   monthlyTotalTokens: number;
   projectedMonthlyTokens: number;
   dailyAverageTokens: number;

@@ -47,6 +47,7 @@ function MainApp() {
   const [error, setError] = useState("");
   const [pricing, setPricing] = useState<PricingSnapshot>(() => pricingService.getSnapshot());
   const [pricingLoading, setPricingLoading] = useState(false);
+  const [modelScanning, setModelScanning] = useState(false);
 
   const load = useCallback(async () => {
     const requestedRange = rangeRef.current;
@@ -61,6 +62,19 @@ function MainApp() {
       setError(translateError(cause, t));
     }
   }, [t]);
+
+  const rescanModels = useCallback(async () => {
+    setModelScanning(true);
+    console.info("[Model Scanner] 开始扫描模型");
+    const models = data?.modelUsage ?? [];
+    console.info("[Model Scanner] 来源：Token记录", models.map((item) => item.model || "unknown"));
+    console.info("[Model Scanner] 最终模型列表：", models.map((item) => item.model || "unknown"));
+    try { await api.syncNow(); await load(); } finally { setModelScanning(false); }
+  }, [data, load]);
+
+  const testMatching = useCallback(() => {
+    for (const model of data?.modelUsage ?? []) console.info("[Price Match]", model.model || "unknown", "→", model.model ? model.model.toLowerCase().replace(/-(sol|codex|pro|nano)$/, "") : "unknown");
+  }, [data]);
 
   const selectRange = useCallback((nextRange: UsageRange) => {
     rangeRef.current = nextRange;
@@ -126,9 +140,11 @@ function MainApp() {
 
   useEffect(() => {
     let stopUsage: (() => void) | undefined;
+    let stopQuota: (() => void) | undefined;
     let stopSettings: (() => void) | undefined;
     let stopLanguage: (() => void) | undefined;
     listen("usage-updated", () => void load()).then((unlisten) => (stopUsage = unlisten));
+    listen("account-quota-updated", () => void load()).then((unlisten) => (stopQuota = unlisten));
     listen("open-settings", () => setView("settings")).then((unlisten) => (stopSettings = unlisten));
     listen<string>("language-changed", (event) => {
       const language = normalizeLanguage(event.payload);
@@ -137,6 +153,7 @@ function MainApp() {
     }).then((unlisten) => (stopLanguage = unlisten));
     return () => {
       stopUsage?.();
+      stopQuota?.();
       stopSettings?.();
       stopLanguage?.();
     };
@@ -168,7 +185,7 @@ function MainApp() {
       </aside>
       <div className="content">
         {error && <div className="error-banner">{error}</div>}
-        {view === "dashboard" ? <Dashboard data={data} range={range} loading={loading} onRange={selectRange} onSync={sync} quotaLoading={quotaLoading} onQuotaSync={syncQuota} /> : view === "cost" ? <Cost data={data} pricing={pricing} onRefresh={() => void refreshPricing()} loading={pricingLoading} /> : <Settings settings={settings} pricing={pricing} pricingLoading={pricingLoading} onRefreshPricing={() => void refreshPricing()} onSaved={(next) => { setSettings(next); void load(); }} />}
+        {view === "dashboard" ? <Dashboard data={data} range={range} loading={loading} onRange={selectRange} onSync={sync} quotaLoading={quotaLoading} onQuotaSync={syncQuota} /> : view === "cost" ? <Cost data={data} pricing={pricing} range={range} onRange={selectRange} onRefresh={() => void refreshPricing()} loading={pricingLoading} /> : <Settings settings={settings} pricing={pricing} pricingLoading={pricingLoading} onRefreshPricing={() => void refreshPricing()} onSaved={(next) => { setSettings(next); void load(); }} data={data} onRescanModels={() => void rescanModels()} modelScanning={modelScanning} onTestMatching={testMatching} />}
       </div>
     </div>
   );

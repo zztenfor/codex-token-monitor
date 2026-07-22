@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { LocalPricingProvider } from "./local_provider";
 import { parseOfficialPricingHtml } from "./remote_provider";
 import { PricingService } from "./pricing_service";
 import type { ModelPricing, PricingCache, PricingProvider } from "./pricing_provider";
@@ -37,6 +38,16 @@ describe("online pricing provider", () => {
   });
 });
 
+describe("local pricing provider", () => {
+  it("includes the official GPT-5.5 price and Codex alias", async () => {
+    const pricing = await new LocalPricingProvider().getPricing("gpt-5.5-codex");
+    expect(pricing?.model).toBe("gpt-5.5");
+    expect(pricing?.inputPerMillion).toBe(5);
+    expect(pricing?.cachedInputPerMillion).toBe(0.5);
+    expect(pricing?.outputPerMillion).toBe(30);
+  });
+});
+
 describe("pricing service", () => {
   it("keeps local pricing when the online provider fails", async () => {
     const failing: PricingProvider = { name: "offline", getModels: async () => { throw new Error("offline"); }, getPricing: async () => { throw new Error("offline"); }, syncPricing: async () => { throw new Error("offline"); } };
@@ -56,7 +67,7 @@ describe("pricing service", () => {
     expect(service.needsSync()).toBe(false);
   });
 
-  it("adds local fallback models that are absent from the online cache", async () => {
+  it("retains bundled models when an online catalog is partial", async () => {
     const fallback = { ...onlineModel, model: "gpt-5.4", modelAlias: "gpt-5.4", source: "local" as const };
     const cached: PricingCache = { updated_at: new Date().toISOString(), version: "today", source: "online", models: [onlineModel] };
     const service = new PricingService(provider([]), provider([fallback]), store(cached));
